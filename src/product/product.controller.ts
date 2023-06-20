@@ -1,51 +1,38 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, Query } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { ObjectId } from 'mongoose';
+// import { FileInterceptor } from '@nestjs/platform-express/multer';
+import { UpdateProductDto } from './dto/update-product-dto';
+import { QueryProductDto } from './dto/query-product.dto';
 
-@Controller('/products')
+@Controller('/product')
 export class ProductController {
-    constructor(private productService: ProductService) { }
+    constructor(private readonly productService: ProductService) { }
 
-    @Post()
+    @Post('/create')
+    // @UseInterceptors(FileInterceptor('image'))
     create(@Body() dto: CreateProductDto) {
         return this.productService.create(dto);
     }
 
     @Get()
-    getAll() {
-        return this.productService.getAll();
+    getAll(@Query() query: QueryProductDto) {
+        return this.productService.getAll(query);
     }
 
     @Get(':id')
     getOne(@Param('id') id: ObjectId) {
-        return this.productService.getOne(id);        
+        return this.productService.getOne(id);
     }
 
+    @Patch(':id')
+    update(@Param('id') id: ObjectId, @Body() dto: UpdateProductDto) {
+        return this.productService.update(id, dto);
+    }
 
-
-    //   @Post()
-    //   create(@Body() createProductDto: CreateProductDto) {
-    //     return this.productService.create(createProductDto);
-    //   }
-
-    //   @Get()
-    //   findAll() {
-    //     return this.productService.findAll();
-    //   }
-
-    //   @Get(':id')
-    //   findOne(@Param('id') id: string) {
-    //     return this.productService.findOne(+id);
-    //   }
-
-    //   @Patch(':id')
-    //   update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
-    //     return this.productService.update(+id, updateProductDto);
-    //   }
-
-    //   @Delete(':id')
-    //   remove(@Param('id') id: string) {
-    //     return this.productService.remove(+id);
-    //   }
+    @Delete(':id')
+    remove(@Param('id') id: ObjectId) {
+        return this.productService.remove(id);
+    }
 }
